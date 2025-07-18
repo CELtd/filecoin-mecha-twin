@@ -237,6 +237,7 @@ def forecast_power_stats(
         - total_qa_scheduled_expire_power
         + total_qa_renewed_power
     )
+    qa_total_power = np.minimum(qa_total_power, fil_plus_m*rb_total_power) # QA power should never be greater than FILPx RB power
     # Build DataFrames
     rb_df = pd.DataFrame(
         {
