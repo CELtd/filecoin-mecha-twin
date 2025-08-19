@@ -112,16 +112,16 @@ def forecast_circulating_supply_df(
         )
         reward_delta = day_locked_rewards - day_reward_release
         # Update dataframe
-        df["day_locked_pledge"].iloc[day_idx] = day_locked_pledge
-        df["day_renewed_pledge"].iloc[day_idx] = day_renewed_pledge
-        df["network_locked_pledge"].iloc[day_idx] = (
-            df["network_locked_pledge"].iloc[day_idx - 1] + pledge_delta
+        df.loc[day_idx, "day_locked_pledge"] = day_locked_pledge
+        df.loc[day_idx, "day_renewed_pledge"] = day_renewed_pledge
+        df.loc[day_idx, "network_locked_pledge"] = (
+            df.loc[day_idx - 1, "network_locked_pledge"] + pledge_delta
         )
-        df["network_locked_reward"].iloc[day_idx] = (
-            df["network_locked_reward"].iloc[day_idx - 1] + reward_delta
+        df.loc[day_idx, "network_locked_reward"] = (
+            df.loc[day_idx - 1, "network_locked_reward"] + reward_delta
         )
-        df["network_locked"].iloc[day_idx] = (
-            df["network_locked"].iloc[day_idx - 1] + pledge_delta + reward_delta
+        df.loc[day_idx, "network_locked"] = (
+            df.loc[day_idx - 1, "network_locked"] + pledge_delta + reward_delta
         )
         # print('%s,%0.02f,%0.02f,%0.02f,%0.02f' % 
         #     ('mechafil', 
@@ -131,9 +131,9 @@ def forecast_circulating_supply_df(
         #     df["network_locked"].iloc[day_idx], )
         # )
         # Update gas burnt
-        if df["network_gas_burn"].iloc[day_idx] == 0.0:
-            df["network_gas_burn"].iloc[day_idx] = (
-                df["network_gas_burn"].iloc[day_idx - 1] + daily_burnt_fil
+        if df.loc[day_idx, "network_gas_burn"] == 0.0:
+            df.loc[day_idx, "network_gas_burn"] = (
+                df.loc[day_idx - 1, "network_gas_burn"] + daily_burnt_fil
             )
         # Find circulating supply balance and update
         # print('=> %s,%0.02f,%0.02f,%0.02f,%0.02f,%0.02f' % 
@@ -153,7 +153,7 @@ def forecast_circulating_supply_df(
             - df["network_locked"].iloc[day_idx]  # from simulation loop
             - df["network_gas_burn"].iloc[day_idx]  # comes from user inputs
         )
-        df["circ_supply"].iloc[day_idx] = max(circ_supply, 0)
+        df.loc[day_idx, "circ_supply"] = max(circ_supply, 0)
     return df
 
 
@@ -188,10 +188,10 @@ def initialise_circulating_supply_df(
         }
     )
     df["date"] = df["date"].dt.date
-    df["network_locked_pledge"].iloc[0] = locked_fil_zero / 2.0
-    df["network_locked_reward"].iloc[0] = locked_fil_zero / 2.0
-    df["network_locked"].iloc[0] = locked_fil_zero
-    df["circ_supply"].iloc[0] = circ_supply_zero
+    df.loc[0, "network_locked_pledge"] = locked_fil_zero / 2.0
+    df.loc[0, "network_locked_reward"] = locked_fil_zero / 2.0
+    df.loc[0, "network_locked"] = locked_fil_zero
+    df.loc[0, "circ_supply"] = circ_supply_zero
     df = df.merge(vest_df, on="date", how="inner")
     df = df.merge(mint_df.drop(columns=["days"]), on="date", how="inner")
     return df
